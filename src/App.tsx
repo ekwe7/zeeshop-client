@@ -1,14 +1,9 @@
-import { useState } from 'react'
+import React from 'react';
+import { LandingPage } from './pages/LandingPage';
+import './styles/global.css';
 
-import './App.css'
+const App: React.FC = () => {
+  return <LandingPage />;
+};
 
-function App() {
-
-  return (
-    <>
-      <h3>Welcome to DMC</h3>
-    </>
-  )
-}
-
-export default App
+export default App;
