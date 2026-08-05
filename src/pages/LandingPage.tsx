@@ -2,14 +2,14 @@ import React from 'react';
 import { HeroSection } from '../components/landing/HeroSection';
 import '../styles/landing.css';
 
-export const LandingPage: React.FC = () => {
-  const handleStartTrial = () => {
-    window.location.href = '/login';
-  };
+interface LandingPageProps {
+  onNavigateToLogin: () => void;
+}
 
+export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToLogin }) => {
   return (
     <div className="landing-container">
-      <HeroSection onStartTrial={handleStartTrial} />
+      <HeroSection onStartTrial={onNavigateToLogin} />
     </div>
   );
 };
