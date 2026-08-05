@@ -13,6 +13,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
   const [granted, setGranted] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleLoginSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setLoading(true);
@@ -124,13 +126,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="form-input"
+                  style={{ paddingRight: '40px' }}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '13px',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-secondary)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 0,
+                  }}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? 'visibility_off' : 'visibility'}
+                  </span>
+                </button>
               </div>
             </div>
 

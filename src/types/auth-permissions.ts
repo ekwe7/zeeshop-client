@@ -90,7 +90,7 @@ export const MOCK_USERS_DB: Record<string, AuthResponsePayload & { pass: string 
     accessToken: 'mock_jwt_access_token_manager_xyz123',
     refreshToken: 'mock_jwt_refresh_token_manager_abc789',
     username: 'alex_manager',
-    email: 'manager@zeeshop.com',
+    email: 'ozed@zeeshop.com',
     pass: 'password123',
     role: 'MANAGER',
     permissions: ROLE_DEFINITIONS.MANAGER.defaultPermissions
@@ -99,7 +99,7 @@ export const MOCK_USERS_DB: Record<string, AuthResponsePayload & { pass: string 
     accessToken: 'mock_jwt_access_token_cashier_xyz123',
     refreshToken: 'mock_jwt_refresh_token_cashier_abc789',
     username: 'operator_john',
-    email: 'operator@zeeshop.com',
+    email: 'nelson@zeeshop.com',
     pass: 'password123',
     role: 'CASHIER',
     permissions: ROLE_DEFINITIONS.CASHIER.defaultPermissions
