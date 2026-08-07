@@ -6,9 +6,9 @@ import type {
   AuthResponsePayload,
 } from "../types/auth-permissions";
 import {
-  MOCK_USERS_DB,
   ROLE_DEFINITIONS,
 } from "../types/auth-permissions";
+import { API_ENDPOINTS } from "../utils/apiConfig";
 
 interface AuthContextType {
   user: User | null;
@@ -56,64 +56,67 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   });
 
   /**
-   * Simulates calling POST /api/v1/auth/login to AuthService.java
+   * Calls POST /api/v1/auth/login on live Render backend
    */
   const login = async (
     email: string,
     pass: string,
   ): Promise<{ success: boolean; error?: string }> => {
-    // Simulate HTTP POST request latency to /api/v1/auth/login
-    await new Promise((res) => setTimeout(res, 800));
+    try {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usernameOrEmail: email,
+          password: pass,
+        }),
+      });
 
-    const mockKey = Object.keys(MOCK_USERS_DB).find(
-      (k) => k.toLowerCase() === email.toLowerCase(),
-    );
-    let payload: AuthResponsePayload;
+      const resJson = await response.json().catch(() => ({}));
 
-    if (mockKey && MOCK_USERS_DB[mockKey]) {
-      const dbRecord = MOCK_USERS_DB[mockKey];
-      payload = {
-        accessToken: dbRecord.accessToken,
-        refreshToken: dbRecord.refreshToken,
-        username: dbRecord.username,
-        email: dbRecord.email,
-        role: dbRecord.role,
-        permissions: dbRecord.permissions,
+      if (!response.ok || (resJson.success !== undefined && !resJson.success)) {
+        return {
+          success: false,
+          error:
+            resJson.message ||
+            resJson.error ||
+            `Authentication failed (HTTP ${response.status})`,
+        };
+      }
+
+      // Backend returns payload wrapped inside `data` property
+      const data = resJson.data || resJson;
+
+      const userData: User = {
+        username: data.username || email.split("@")[0],
+        email: data.email || email,
+        role: data.role || "ADMIN",
+        permissions:
+          data.permissions ||
+          ROLE_DEFINITIONS[data.role || "ADMIN"]?.defaultPermissions ||
+          [],
       };
-    } else {
-      // Dynamic fallback mapping for custom login tests
-      let role: Role = "CASHIER";
-      if (email.includes("admin")) role = "ADMIN";
-      else if (email.includes("manager")) role = "MANAGER";
 
-      payload = {
-        accessToken: `jwt_access_${Math.random().toString(36).substring(2)}`,
-        refreshToken: `jwt_refresh_${Math.random().toString(36).substring(2)}`,
-        username: email.split("@")[0],
-        email: email,
-        role: role,
-        permissions: ROLE_DEFINITIONS[role].defaultPermissions,
+      const tokenData = {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      };
+
+      setUser(userData);
+      setTokens(tokenData);
+      localStorage.setItem("zeeshop_user", JSON.stringify(userData));
+      localStorage.setItem("zeeshop_tokens", JSON.stringify(tokenData));
+
+      return { success: true };
+    } catch (err: any) {
+      console.error("Backend login request failed:", err);
+      return {
+        success: false,
+        error: err.message || "Failed to reach backend server. Please try again.",
       };
     }
-
-    const userData: User = {
-      username: payload.username,
-      email: payload.email,
-      role: payload.role,
-      permissions: payload.permissions,
-    };
-
-    const tokenData = {
-      accessToken: payload.accessToken,
-      refreshToken: payload.refreshToken,
-    };
-
-    setUser(userData);
-    setTokens(tokenData);
-    localStorage.setItem("zeeshop_user", JSON.stringify(userData));
-    localStorage.setItem("zeeshop_tokens", JSON.stringify(tokenData));
-
-    return { success: true };
   };
 
   const logout = () => {

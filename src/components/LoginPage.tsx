@@ -142,7 +142,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                     right: '13px',
                     background: 'none',
                     border: 'none',
-                    color: 'var(--color-secondary)',
+                    color: 'var(--col  or-secondary)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
