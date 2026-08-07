@@ -33,108 +33,18 @@ export const DashboardLayout: React.FC = () => {
               </span>
             </div>
             <div>
-              <h1 style={{ fontSize: '1.1rem', fontWeight: 700 }}>ZeeShop</h1>
-              <span style={{ fontSize: '0.65rem', color: 'var(--color-secondary)', textTransform: 'uppercase' }}>
-                POST /api/v1/auth/login
-              </span>
+              <h1 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Vino Health</h1>
             </div>
           </div>
 
           {/* User Profile Card */}
           <div className="user-card">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div className="user-avatar">{initials}</div>
               <div>
                 <p style={{ fontWeight: 600, fontSize: '0.85rem' }}>{user.username}</p>
-                <span className="role-badge">{currentRoleInfo.title}</span>
+                <span className="role-badge">{currentRoleInfo?.title || user.role}</span>
               </div>
-            </div>
-
-            <button
-              onClick={() => setShowTokenModal(true)}
-              style={{
-                width: '100%',
-                padding: '6px',
-                fontSize: '0.75rem',
-                backgroundColor: '#ffffff',
-                border: '1px solid var(--color-outline-variant)',
-                borderRadius: 'var(--radius-sm)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                marginTop: '8px',
-              }}
-            >
-              <span className="material-symbols-outlined text-[14px]">key</span>
-              Inspect JWT Tokens
-            </button>
-
-            {/* Interactive Role Switcher */}
-            <div style={{ position: 'relative', marginTop: '8px' }}>
-              <button
-                type="button"
-                onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
-                style={{
-                  width: '100%',
-                  padding: '6px 8px',
-                  fontSize: '0.75rem',
-                  backgroundColor: 'var(--color-surface)',
-                  border: '1px solid var(--color-outline-variant)',
-                  borderRadius: 'var(--radius-sm)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  cursor: 'pointer',
-                }}
-              >
-                <span>
-                  Role: <strong style={{ color: 'var(--color-primary)' }}>{user.role}</strong>
-                </span>
-                <span className="material-symbols-outlined text-[14px]">expand_more</span>
-              </button>
-
-              {showRoleSwitcher && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    backgroundColor: '#ffffff',
-                    border: '1px solid var(--color-outline-variant)',
-                    borderRadius: 'var(--radius-sm)',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
-                    zIndex: 30,
-                    padding: '4px',
-                    marginTop: '4px',
-                  }}
-                >
-                  {(["ADMIN", "MANAGER", "CASHIER"] as Role[]).map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => {
-                        switchRoleDemo(r);
-                        setShowRoleSwitcher(false);
-                      }}
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '6px 8px',
-                        fontSize: '0.75rem',
-                        border: 'none',
-                        background: user.role === r ? 'var(--color-surface-container)' : 'transparent',
-                        fontWeight: user.role === r ? 700 : 400,
-                        color: user.role === r ? 'var(--color-primary)' : 'var(--color-on-surface)',
-                        cursor: 'pointer',
-                        borderRadius: 'var(--radius-sm)',
-                      }}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
@@ -166,11 +76,23 @@ export const DashboardLayout: React.FC = () => {
 
             <button
               onClick={() => {
-                if (hasPermission("USERS_MANAGE")) setActiveTab("users");
+                if (hasPermission("USERS_MANAGE") || hasPermission("USER_READ") || hasPermission("USER_WRITE") || hasRole("ADMIN")) {
+                  setActiveTab("users");
+                }
               }}
-              disabled={!hasPermission("USERS_MANAGE")}
+              disabled={
+                !hasPermission("USERS_MANAGE") &&
+                !hasPermission("USER_READ") &&
+                !hasPermission("USER_WRITE") &&
+                !hasRole("ADMIN")
+              }
               className={`nav-item ${activeTab === "users" ? "active" : ""} ${
-                !hasPermission("USERS_MANAGE") ? "disabled" : ""
+                !hasPermission("USERS_MANAGE") &&
+                !hasPermission("USER_READ") &&
+                !hasPermission("USER_WRITE") &&
+                !hasRole("ADMIN")
+                  ? "disabled"
+                  : ""
               }`}
             >
               <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
@@ -308,61 +230,7 @@ export const DashboardLayout: React.FC = () => {
 
 /* --- TAB COMPONENTS WITH PURE CSS --- */
 
-const OverviewTab: React.FC = () => {
-  const { hasPermission, user } = useAuth();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div
-        style={{
-          padding: '24px',
-          borderRadius: 'var(--radius-xl)',
-          background: 'linear-gradient(135deg, #005c3e 0%, #006c49 100%)',
-          color: '#ffffff',
-        }}
-      >
-        <span className="brand-badge" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-          Unified Architecture
-        </span>
-        <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '8px 0' }}>
-          Authenticated as {user?.role}
-        </h3>
-        <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-          UI routes and action buttons adapt dynamically according to the permissions array.
-        </p>
-      </div>
-
-      {hasPermission("ANALYTICS_READ") ? (
-        <div className="grid-3">
-          <div className="stat-card">
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-secondary)', fontWeight: 700 }}>
-              Total Sales Today
-            </span>
-            <p className="stat-val">$4,850.00</p>
-          </div>
-          <div className="stat-card">
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-secondary)', fontWeight: 700 }}>
-              Items Sold
-            </span>
-            <p className="stat-val">142 Units</p>
-          </div>
-          <div className="stat-card">
-            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--color-secondary)', fontWeight: 700 }}>
-              Low Stock Alerts
-            </span>
-            <p className="stat-val" style={{ color: '#ba1a1a' }}>3 Products</p>
-          </div>
-        </div>
-      ) : (
-        <div className="stat-card" style={{ textAlign: 'center', padding: '32px' }}>
-          <span className="material-symbols-outlined text-3xl" style={{ color: 'var(--color-secondary)' }}>lock</span>
-          <p style={{ fontWeight: 600, marginTop: '8px' }}>Analytics Locked</p>
-          <p style={{ fontSize: '0.8rem', color: 'var(--color-secondary)' }}>Requires ANALYTICS_READ permission.</p>
-        </div>
-      )}
-    </div>
-  );
-};
+import { OverviewTab } from "./OverviewTab";
 
 const SalesTab: React.FC = () => {
   return (
@@ -453,13 +321,10 @@ const InventoryTab: React.FC = () => {
   );
 };
 
+import { UserManagement } from "./UserManagement";
+
 const UsersTab: React.FC = () => {
-  return (
-    <div className="stat-card">
-      <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '16px' }}>User & Role Governance</h3>
-      <p style={{ fontSize: '0.85rem', color: 'var(--color-secondary)' }}>Manage store operators and permissions.</p>
-    </div>
-  );
+  return <UserManagement />;
 };
 
 const SettingsTab: React.FC = () => {

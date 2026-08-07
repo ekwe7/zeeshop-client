@@ -8,6 +8,9 @@ export const API_ENDPOINTS = {
   LOGOUT_ALL: `${API_BASE_URL}/api/auth/logout-all`,
   PRODUCTS: `${API_BASE_URL}/api/v1/products`,
   CUSTOMERS: `${API_BASE_URL}/api/v1/customers`,
+  USERS: `${API_BASE_URL}/api/users`,
+  ROLES: `${API_BASE_URL}/api/roles`,
+  SALES: `${API_BASE_URL}/api/v1/sales`,
   SWAGGER: `https://zeeshop-server.onrender.com/swagger-ui.html`,
 };
 

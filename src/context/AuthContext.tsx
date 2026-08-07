@@ -112,9 +112,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       return { success: true };
     } catch (err: any) {
       console.error("Backend login request failed:", err);
+      const isNetworkErr = err.name === "TypeError" || err.message?.includes("fetch");
       return {
         success: false,
-        error: err.message || "Failed to reach backend server. Please try again.",
+        error: isNetworkErr
+          ? "Network connection changed or server unreachable. Please check your internet connection and try again."
+          : err.message || "Failed to reach backend server. Please try again.",
       };
     }
   };

@@ -45,7 +45,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onBackToLanding }) => {
                 shopping_bag
               </span>
             </div>
-            <span className="brand-title">ZeeShop</span>
+            <span className="brand-title">Vino Health</span>
           </div>
 
           <div>

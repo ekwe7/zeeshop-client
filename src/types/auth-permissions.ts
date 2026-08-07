@@ -3,13 +3,17 @@ export type Role = 'ADMIN' | 'MANAGER' | 'CASHIER';
 export type Permission = 
   | 'ANALYTICS_READ'
   | 'USERS_MANAGE'
+  | 'USER_READ'
+  | 'USER_WRITE'
   | 'ROLES_MANAGE'
   | 'INVENTORY_READ'
   | 'INVENTORY_WRITE'
   | 'SALES_CREATE'
   | 'SALES_READ'
+  | 'SALES_WRITE'
   | 'REFUNDS_CREATE'
-  | 'SETTINGS_MANAGE';
+  | 'SETTINGS_MANAGE'
+  | string;
 
 export interface AuthResponsePayload {
   accessToken: string;
