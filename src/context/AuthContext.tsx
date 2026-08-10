@@ -100,14 +100,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       };
 
       const tokenData = {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
+        accessToken:
+          data.accessToken ||
+          data.token ||
+          data.jwt ||
+          resJson.accessToken ||
+          resJson.token ||
+          resJson.jwt ||
+          "",
+        refreshToken:
+          data.refreshToken ||
+          resJson.refreshToken ||
+          "",
       };
 
       setUser(userData);
       setTokens(tokenData);
       localStorage.setItem("zeeshop_user", JSON.stringify(userData));
       localStorage.setItem("zeeshop_tokens", JSON.stringify(tokenData));
+      if (tokenData.accessToken) {
+        localStorage.setItem("accessToken", tokenData.accessToken);
+      }
+      if (tokenData.refreshToken) {
+        localStorage.setItem("refreshToken", tokenData.refreshToken);
+      }
 
       return { success: true };
     } catch (err: any) {
@@ -127,6 +143,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setTokens(null);
     localStorage.removeItem("zeeshop_user");
     localStorage.removeItem("zeeshop_tokens");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
   };
 
   const hasPermission = (permission: Permission): boolean => {

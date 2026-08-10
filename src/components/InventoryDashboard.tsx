@@ -444,7 +444,11 @@ export const InventoryDashboard: React.FC = () => {
                     const sku = item.sku || item.id || `SKU-${idx + 1}`;
                     const name = item.name || item.title || "Unnamed Product";
                     const stock =
-                      item.stockQuantity ?? item.stock ?? item.quantity ?? 0;
+                      item.quantityOnHand ??
+                      item.stockQuantity ??
+                      item.stock ??
+                      item.quantity ??
+                      0;
                     const minThreshold = item.minStockThreshold || 15;
 
                     let rowClass = "hover:bg-surface-container/50 transition-colors group";
