@@ -5,10 +5,10 @@ import { ROLE_DEFINITIONS } from "../types/auth-permissions";
 import { fetchProducts } from "../utils/apiClient";
 
 export const DashboardLayout: React.FC = () => {
-  const { user, tokens, logout, hasPermission, switchRoleDemo } = useAuth();
+  const { user, tokens, logout, hasPermission, hasRole, switchRoleDemo } = useAuth();
   const [activeTab, setActiveTab] = useState<
-    "overview" | "inventory" | "users" | "sales" | "settings"
-  >("overview");
+    "overview" | "catalog" | "inventory" | "users" | "sales" | "settings"
+  >("catalog");
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
 
@@ -67,11 +67,19 @@ export const DashboardLayout: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setActiveTab("catalog")}
+              className={`nav-item ${activeTab === "catalog" ? "active" : ""}`}
+            >
+              <span className="material-symbols-outlined text-[20px]">category</span>
+              Master Catalog
+            </button>
+
+            <button
               onClick={() => setActiveTab("inventory")}
               className={`nav-item ${activeTab === "inventory" ? "active" : ""}`}
             >
               <span className="material-symbols-outlined text-[20px]">inventory_2</span>
-              Inventory Catalog
+              Stock Inventory
             </button>
 
             <button
@@ -142,34 +150,13 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Main Content Area */}
       <main className="main-content">
-        {/* Top bar info */}
-        <header className="page-header">
-          <div>
-            <h2 className="page-title" style={{ textTransform: 'capitalize' }}>
-              {activeTab} Section
-            </h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-secondary)', marginTop: '4px' }}>
-              Authenticated User: <strong>{user.username}</strong> ({user.email}) &bull; Role:{" "}
-              <strong style={{ color: 'var(--color-primary)' }}>{user.role}</strong>
-            </p>
-          </div>
 
-          <div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-secondary)', display: 'block', marginBottom: '4px' }}>
-              Permissions:
-            </span>
-            {user.permissions.map((p) => (
-              <span key={p} className="perm-pill">
-                {p}
-              </span>
-            ))}
-          </div>
-        </header>
 
         {/* Render Active Tab */}
         {activeTab === "overview" && <OverviewTab />}
-        {activeTab === "sales" && <SalesTab />}
+        {activeTab === "catalog" && <CatalogTab />}
         {activeTab === "inventory" && <InventoryTab />}
+        {activeTab === "sales" && <SalesTab />}
         {activeTab === "users" && <UsersTab />}
         {activeTab === "settings" && <SettingsTab />}
 
@@ -250,75 +237,16 @@ const SalesTab: React.FC = () => {
   );
 };
 
+import { CatalogDashboard } from "./CatalogDashboard";
+
+const CatalogTab: React.FC = () => {
+  return <CatalogDashboard />;
+};
+
+import { InventoryDashboard } from "./InventoryDashboard";
+
 const InventoryTab: React.FC = () => {
-  const { hasPermission } = useAuth();
-  const canWrite = hasPermission("INVENTORY_WRITE");
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchProducts()
-      .then((data) => {
-        setProducts(Array.isArray(data) ? data : data.content || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching products:", err);
-        setError(err.message || "Failed to load live products from server");
-        setLoading(false);
-      });
-  }, []);
-
-  return (
-    <div className="stat-card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <h3 style={{ fontWeight: 700, fontSize: '1.1rem' }}>Inventory Catalog (Live Server Data)</h3>
-        {canWrite && <button className="btn-primary" style={{ width: 'auto', padding: '8px 16px', marginTop: 0 }}>Add Item</button>}
-      </div>
-
-      {loading ? (
-        <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-secondary)' }}>
-          <span className="material-symbols-outlined animate-spin text-2xl">progress_activity</span>
-          <p style={{ marginTop: '8px' }}>Fetching products from live backend...</p>
-        </div>
-      ) : error ? (
-        <div className="error-banner" style={{ marginBottom: '16px' }}>
-          <span className="material-symbols-outlined text-[16px]">error</span>
-          {error}
-        </div>
-      ) : (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>ID / SKU</th>
-              <th>Product Name</th>
-              <th>Stock</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.length === 0 ? (
-              <tr>
-                <td colSpan={4} style={{ textAlign: 'center', padding: '16px' }}>
-                  No products found in backend catalog.
-                </td>
-              </tr>
-            ) : (
-              products.map((item: any, idx: number) => (
-                <tr key={item.id || idx}>
-                  <td style={{ fontFamily: 'monospace' }}>{item.sku || item.id || `PROD-${idx + 1}`}</td>
-                  <td>{item.name || item.title || "Unnamed Product"}</td>
-                  <td>{item.stockQuantity ?? item.stock ?? item.quantity ?? 0} units</td>
-                  <td>${Number(item.price || 0).toFixed(2)}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
+  return <InventoryDashboard />;
 };
 
 import { UserManagement } from "./UserManagement";

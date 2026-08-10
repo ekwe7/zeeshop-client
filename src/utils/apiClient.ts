@@ -85,6 +85,7 @@ export interface CreateUserPayload {
   username: string;
   email: string;
   password?: string;
+  role?: string;
   roleId?: string;
   enabled?: boolean;
 }
@@ -93,6 +94,7 @@ export interface UpdateUserPayload {
   username: string;
   email: string;
   password?: string;
+  role?: string;
   roleId?: string;
   enabled?: boolean;
 }
@@ -100,10 +102,17 @@ export interface UpdateUserPayload {
 export const fetchRoles = async (): Promise<BackendRole[]> => {
   try {
     const res = await apiFetch(API_ENDPOINTS.ROLES);
-    return res.data || res;
-  } catch {
-    return [];
+    const rolesList: BackendRole[] = res.data || res;
+    if (Array.isArray(rolesList) && rolesList.length > 0) {
+      return rolesList.filter((r) => r.name.toUpperCase() !== "ADMIN" && r.id.toUpperCase() !== "ADMIN");
+    }
+  } catch (e) {
+    // Dynamic fetch fallback to local roles
   }
+  return [
+    { id: "CASHIER", name: "CASHIER", description: "Cashier / Staff" },
+    { id: "MANAGER", name: "MANAGER", description: "Store Manager" },
+  ];
 };
 
 export const fetchUsers = async (): Promise<BackendUser[]> => {
@@ -117,9 +126,17 @@ export const fetchUserById = async (id: string): Promise<BackendUser> => {
 };
 
 export const createUser = async (payload: CreateUserPayload): Promise<BackendUser> => {
+  const requestBody: Record<string, any> = {
+    username: payload.username,
+    email: payload.email,
+    password: payload.password,
+    roleId: payload.roleId || payload.role,
+    enabled: payload.enabled ?? true,
+  };
+
   const res = await apiFetch(API_ENDPOINTS.USERS, {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify(requestBody),
   });
   return res.data || res;
 };

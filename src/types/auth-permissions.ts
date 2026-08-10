@@ -41,7 +41,7 @@ export interface RolePermissions {
 export const ROLE_DEFINITIONS: Record<Role, RolePermissions> = {
   ADMIN: {
     role: 'ADMIN',
-    title: 'Super Administrator',
+    title: 'Administrator',
     description: 'Full access to system control, user management, and global store settings.',
     defaultPermissions: [
       'ANALYTICS_READ',

@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://zeeshop-server.onrender.com";
+  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.DEV ? "" : "https://zeeshop-server.onrender.com");
 
 export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/api/auth/login`,

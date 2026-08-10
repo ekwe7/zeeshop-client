@@ -29,9 +29,9 @@ export const UserManagement: React.FC = () => {
     username: "",
     email: "",
     password: "",
-    roleId: "",
+    roleId: "MANAGER",
     enabled: true,
-  });
+  }); 
   const [showPassword, setShowPassword] = useState(false);
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -49,12 +49,18 @@ export const UserManagement: React.FC = () => {
       }
 
       if (roleData.status === "fulfilled" && Array.isArray(roleData.value) && roleData.value.length > 0) {
-        setRoles(roleData.value);
+        const validRoles = roleData.value.filter(
+          (r) => r.name.toUpperCase() !== "ADMIN" && r.id.toUpperCase() !== "ADMIN"
+        );
+        setRoles(validRoles);
+        if (validRoles.length > 0) {
+          setModalForm((prev) => ({ ...prev, roleId: validRoles[0].id || validRoles[0].name }));
+        }
       } else {
         // Extract existing roleId mappings from user list if /api/roles returns empty
         const roleMap = new Map<string, string>();
         fetchedUsers.forEach((u: any) => {
-          if (u.roleId && u.roleName) {
+          if (u.roleId && u.roleName && u.roleName.toUpperCase() !== "ADMIN") {
             roleMap.set(u.roleName, u.roleId);
           }
         });
@@ -64,6 +70,7 @@ export const UserManagement: React.FC = () => {
             name,
           }));
           setRoles(extractedRoles);
+          setModalForm((prev) => ({ ...prev, roleId: extractedRoles[0].id || extractedRoles[0].name }));
         }
       }
     } catch (err: any) {
@@ -94,7 +101,7 @@ export const UserManagement: React.FC = () => {
     } else {
       setSelectedUserIds([]);
     }
-  };
+  }; 
 
   const handleSelectUser = (id: string) => {
     setSelectedUserIds((prev) =>
@@ -144,10 +151,19 @@ export const UserManagement: React.FC = () => {
     e.preventDefault();
     setFormError(null);
 
+    // const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
     if (!modalForm.roleId) {
       setFormError("Please select a role for the user.");
       return;
     }
+
+    // if (!uuidRegex.test(modalForm.roleId)) {
+    //   setFormError(
+    //     `Selected role value ("${modalForm.roleId}") is not a valid 36-character UUID string required by backend CreateUserRequest.roleId. Please choose a valid role with a UUID or ensure role IDs are loaded.`
+    //   );
+    //   return;
+    // }
 
     setFormSubmitting(true);
     try {
@@ -155,6 +171,7 @@ export const UserManagement: React.FC = () => {
         username: modalForm.username,
         email: modalForm.email,
         password: modalForm.password,
+        role: modalForm.roleId,
         roleId: modalForm.roleId,
         enabled: modalForm.enabled ?? true,
       };
@@ -166,7 +183,7 @@ export const UserManagement: React.FC = () => {
         username: "",
         email: "",
         password: "",
-        roleId: "",
+        roleId: "MANAGER",
         enabled: true,
       });
     } catch (err: any) {
@@ -231,7 +248,7 @@ export const UserManagement: React.FC = () => {
               maxWidth: "600px",
             }}
           >
-            Manage system access, assign roles (Admin, Manager, Cashier), and monitor user activity across all Vino Health modules.
+            Manage system access, assign roles (Manager, Cashier), and monitor user activity across all Vino Health modules.
           </p>
         </div>
 
@@ -322,7 +339,7 @@ export const UserManagement: React.FC = () => {
             <span className="material-symbols-outlined text-primary">verified_user</span>
           </div>
           <p style={{ fontSize: "0.8rem", color: "var(--color-secondary)", marginTop: "8px" }}>
-            Admin-only provisioning enforced. Cashiers & Managers cannot create or edit user accounts.
+            Admin-only provisioning enforced. Assignable roles restricted to Manager & Cashier.
           </p>
         </div>
       </div>
@@ -653,23 +670,23 @@ export const UserManagement: React.FC = () => {
                   className="form-input"
                   style={{ paddingLeft: "12px" }}
                   required
-                  value={modalForm.roleId || ""}
+                  value={modalForm.roleId || "MANAGER"}
                   onChange={(e) =>
                     setModalForm((prev) => ({ ...prev, roleId: e.target.value }))
                   }
                 >
-                  <option value="">Select a role (Manager / Cashier)...</option>
                   {roles.length > 0 ? (
-                    roles.map((r) => (
-                      <option key={r.id || r.name} value={r.id || r.name}>
-                        {r.name} {r.description ? `- ${r.description}` : ""}
-                      </option>
-                    ))
+                    roles
+                      .filter((r) => r.name.toUpperCase() !== "ADMIN" && r.id.toUpperCase() !== "ADMIN")
+                      .map((r) => (
+                        <option key={r.id || r.name} value={r.name || r.id}>
+                          {r.name === "MANAGER" ? "Manager" : r.name === "CASHIER" ? "Cashier / Staff" : r.name} {r.description ? `- ${r.description}` : ""}
+                        </option>
+                      ))
                   ) : (
                     <>
                       <option value="MANAGER">Store Manager (MANAGER)</option>
                       <option value="CASHIER">Cashier / Staff (CASHIER)</option>
-                      <option value="ADMIN">Super Administrator (ADMIN)</option>
                     </>
                   )}
                 </select>
