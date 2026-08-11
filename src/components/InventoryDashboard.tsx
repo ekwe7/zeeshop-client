@@ -329,7 +329,7 @@ export const InventoryDashboard: React.FC = () => {
             <p className="font-headline-md text-headline-md text-on-surface">
               {loading
                 ? "..."
-                : `$${(totalInventoryValue / 1000).toFixed(1)}k`}
+                : `₦${(totalInventoryValue / 1000).toFixed(1)}k`}
             </p>
           </div>
         </div>

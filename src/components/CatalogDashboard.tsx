@@ -620,7 +620,7 @@ export const CatalogDashboard: React.FC = () => {
                         <td className="p-3 font-medium">{name}</td>
                         <td className="p-3 text-secondary">{cat}</td>
                         <td className="p-3 text-right font-code-mono text-[13px]">
-                          ${price.toFixed(2)}
+                          ₦{price.toFixed(2)}
                         </td>
                         <td className="p-3 text-center text-secondary">{unit}</td>
                         <td
@@ -914,7 +914,7 @@ export const CatalogDashboard: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-label-sm text-label-sm text-secondary mb-1">
-                      Base Price ($) *
+                      Base Price (₦) *
                     </label>
                     <input
                       type="number"

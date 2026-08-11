@@ -466,3 +466,37 @@ body {
   color: var(--color-on-surface);
   margin-top: 4px;
 }
+
+/* ==========================================================================
+   PURE CSS DESIGN TOKEN UTILITIES (NO TAILWIND DEMANDED)
+   ========================================================================== */
+.bg-surface-container-lowest { background-color: var(--color-surface-container-lowest); }
+.bg-surface-container-low { background-color: var(--color-surface-container-low); }
+.bg-surface-container { background-color: var(--color-surface-container); }
+.bg-surface-container-high { background-color: var(--color-surface-container-high); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-container { background-color: var(--color-primary-container); }
+.bg-secondary-container { background-color: var(--color-secondary-container); }
+.bg-error-container { background-color: #ffdad6; }
+.bg-error { background-color: #ba1a1a; }
+.bg-secondary { background-color: var(--color-secondary); }
+
+.text-on-surface { color: var(--color-on-surface); }
+.text-on-surface-variant { color: var(--color-on-surface-variant); }
+.text-secondary { color: var(--color-secondary); }
+.text-primary { color: var(--color-primary); }
+.text-on-primary { color: var(--color-on-primary); }
+.text-error { color: #ba1a1a; }
+
+.border-outline-variant { border-color: var(--color-outline-variant); }
+.border-primary { border-color: var(--color-primary); }
+.border-error { border-color: #ba1a1a; }
+
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: 16px; }
+.rounded-full { border-radius: var(--radius-full); }
+
+.font-body-md { font-size: 14px; line-height: 20px; }
+.font-label-sm { font-size: 12px; line-height: 16px; font-weight: 500; }
+.font-code-mono { font-family: monospace; font-size: 13px; }

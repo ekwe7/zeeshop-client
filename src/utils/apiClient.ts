@@ -377,6 +377,68 @@ export const deactivateUser = async (id: string): Promise<BackendUser> => {
   return res.data || res;
 };
 
+export interface SaleItemPayload {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface CreateSalePayload {
+  items: SaleItemPayload[];
+  paymentMethod?: string;
+  customerName?: string;
+}
+
 export const fetchSales = async () => {
-  return apiFetch(API_ENDPOINTS.SALES);
+  const res = await apiFetch(API_ENDPOINTS.SALES);
+  return res.data || res;
+};
+
+export const createSale = async (payload: CreateSalePayload) => {
+  const res = await apiFetch(API_ENDPOINTS.SALES, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
+};
+
+export interface CustomerPayload {
+  name: string;
+  email?: string;
+  phone?: string;
+  creditLimit?: number;
+}
+
+export const createCustomer = async (payload: CustomerPayload) => {
+  const res = await apiFetch(API_ENDPOINTS.CUSTOMERS, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
+};
+
+export const fetchSuppliers = async () => {
+  const res = await apiFetch(API_ENDPOINTS.SUPPLIERS);
+  return res.data || res;
+};
+
+export const createSupplier = async (payload: any) => {
+  const res = await apiFetch(API_ENDPOINTS.SUPPLIERS, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
+};
+
+export const fetchPurchaseOrders = async () => {
+  const res = await apiFetch(API_ENDPOINTS.PURCHASE_ORDERS);
+  return res.data || res;
+};
+
+export const createPurchaseOrder = async (payload: any) => {
+  const res = await apiFetch(API_ENDPOINTS.PURCHASE_ORDERS, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
 };

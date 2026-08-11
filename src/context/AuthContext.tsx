@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type {
   User,
   Role,
@@ -170,6 +170,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     setUser(updatedUser);
     localStorage.setItem("zeeshop_user", JSON.stringify(updatedUser));
   };
+
+  useEffect(() => {
+    if (!user) return;
+
+    let inactivityTimer: ReturnType<typeof setTimeout>;
+
+    const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutes in milliseconds
+
+    const resetInactivityTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        console.warn("[Session Security] User inactive for 2 minutes. Logging out automatically.");
+        logout();
+      }, INACTIVITY_TIMEOUT);
+    };
+
+    // User activity event listeners
+    const activityEvents = ["mousemove", "click", "keydown", "scroll", "touchstart"];
+
+    activityEvents.forEach((eventType) => {
+      window.addEventListener(eventType, resetInactivityTimer);
+    });
+
+    // Start timer on initial mount / login
+    resetInactivityTimer();
+
+    return () => {
+      clearTimeout(inactivityTimer);
+      activityEvents.forEach((eventType) => {
+        window.removeEventListener(eventType, resetInactivityTimer);
+      });
+    };
+  }, [user]);
 
   return (
     <AuthContext.Provider

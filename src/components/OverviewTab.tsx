@@ -113,7 +113,7 @@ export const OverviewTab: React.FC = () => {
                     Total Sales
                   </p>
                   <h2 style={{ fontSize: "1.85rem", fontWeight: 700, margin: "4px 0", letterSpacing: "-0.02em" }}>
-                    ${totalSalesAmount > 0 ? totalSalesAmount.toLocaleString("en-US", { minimumFractionDigits: 2 }) : "0.00"}
+                    ₦{totalSalesAmount > 0 ? totalSalesAmount.toLocaleString("en-US", { minimumFractionDigits: 2 }) : "0.00"}
                   </h2>
                 </div>
                 <div
@@ -306,7 +306,7 @@ export const OverviewTab: React.FC = () => {
                             </div>
                           </td>
                           <td style={{ color: "var(--color-secondary)" }}>{dateStr}</td>
-                          <td style={{ fontWeight: 700 }}>${amount.toFixed(2)}</td>
+                          <td style={{ fontWeight: 700 }}>₦{amount.toFixed(2)}</td>
                           <td>
                             <span
                               style={{

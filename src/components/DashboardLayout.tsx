@@ -7,8 +7,8 @@ import { fetchProducts } from "../utils/apiClient";
 export const DashboardLayout: React.FC = () => {
   const { user, tokens, logout, hasPermission, hasRole, switchRoleDemo } = useAuth();
   const [activeTab, setActiveTab] = useState<
-    "overview" | "catalog" | "inventory" | "users" | "sales" | "settings"
-  >("catalog");
+    "overview" | "catalog" | "inventory" | "users" | "sales" | "settings" | "debt" | "suppliers"
+  >(() => (user?.role === "CASHIER" ? "sales" : "catalog"));
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
 
@@ -83,42 +83,40 @@ export const DashboardLayout: React.FC = () => {
             </button>
 
             <button
-              onClick={() => {
-                if (hasPermission("USERS_MANAGE") || hasPermission("USER_READ") || hasPermission("USER_WRITE") || hasRole("ADMIN")) {
-                  setActiveTab("users");
-                }
-              }}
-              disabled={
-                !hasPermission("USERS_MANAGE") &&
-                !hasPermission("USER_READ") &&
-                !hasPermission("USER_WRITE") &&
-                !hasRole("ADMIN")
-              }
-              className={`nav-item ${activeTab === "users" ? "active" : ""} ${
-                !hasPermission("USERS_MANAGE") &&
-                !hasPermission("USER_READ") &&
-                !hasPermission("USER_WRITE") &&
-                !hasRole("ADMIN")
-                  ? "disabled"
-                  : ""
-              }`}
+              onClick={() => setActiveTab("suppliers")}
+              className={`nav-item ${activeTab === "suppliers" ? "active" : ""}`}
             >
-              <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
-              Users & Roles
+              <span className="material-symbols-outlined text-[20px]">local_shipping</span>
+              Suppliers
             </button>
 
             <button
-              onClick={() => {
-                if (hasPermission("SETTINGS_MANAGE")) setActiveTab("settings");
-              }}
-              disabled={!hasPermission("SETTINGS_MANAGE")}
-              className={`nav-item ${activeTab === "settings" ? "active" : ""} ${
-                !hasPermission("SETTINGS_MANAGE") ? "disabled" : ""
-              }`}
+              onClick={() => setActiveTab("debt")}
+              className={`nav-item ${activeTab === "debt" ? "active" : ""}`}
             >
-              <span className="material-symbols-outlined text-[20px]">settings</span>
-              Store Settings
+              <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+              Debt Management
             </button>
+
+            {(hasPermission("USERS_MANAGE") || hasPermission("USER_READ") || hasPermission("USER_WRITE") || hasRole("ADMIN")) && (
+              <button
+                onClick={() => setActiveTab("users")}
+                className={`nav-item ${activeTab === "users" ? "active" : ""}`}
+              >
+                <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                Users & Roles
+              </button>
+            )}
+
+            {(hasPermission("SETTINGS_MANAGE") || hasRole("ADMIN")) && (
+              <button
+                onClick={() => setActiveTab("settings")}
+                className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
+              >
+                <span className="material-symbols-outlined text-[20px]">settings</span>
+                Store Settings
+              </button>
+            )}
           </nav>
         </div>
 
@@ -157,6 +155,8 @@ export const DashboardLayout: React.FC = () => {
         {activeTab === "catalog" && <CatalogTab />}
         {activeTab === "inventory" && <InventoryTab />}
         {activeTab === "sales" && <SalesTab />}
+        {activeTab === "suppliers" && <SupplierManagementTab />}
+        {activeTab === "debt" && <DebtManagementTab />}
         {activeTab === "users" && <UsersTab />}
         {activeTab === "settings" && <SettingsTab />}
 
@@ -219,22 +219,10 @@ export const DashboardLayout: React.FC = () => {
 
 import { OverviewTab } from "./OverviewTab";
 
+import { PosCheckoutTab } from "./PosCheckoutTab";
+
 const SalesTab: React.FC = () => {
-  return (
-    <div className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <h3 style={{ fontWeight: 700, fontSize: '1.1rem' }}>POS Checkout</h3>
-      <div className="grid-3">
-        {["Minimalist Hoodie", "Leather Wallet", "Denim Jacket"].map((item, idx) => (
-          <div key={item} className="role-picker-box" style={{ marginBottom: 0 }}>
-            <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>{item}</p>
-            <p style={{ fontWeight: 700, color: 'var(--color-primary)', marginTop: '4px' }}>
-              ${(29.99 + idx * 15).toFixed(2)}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <PosCheckoutTab />;
 };
 
 import { CatalogDashboard } from "./CatalogDashboard";
@@ -244,6 +232,8 @@ const CatalogTab: React.FC = () => {
 };
 
 import { InventoryDashboard } from "./InventoryDashboard";
+import { SupplierManagementTab } from "./SupplierManagementTab";
+import { DebtManagementTab } from "./DebtManagementTab";
 
 const InventoryTab: React.FC = () => {
   return <InventoryDashboard />;
