@@ -417,17 +417,61 @@ export const createCustomer = async (payload: CustomerPayload) => {
   return res.data || res;
 };
 
-export const fetchSuppliers = async () => {
+export interface SupplierPayload {
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+}
+
+export interface BackendSupplier {
+  id: string;
+  name: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  balance?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const fetchSuppliers = async (): Promise<BackendSupplier[]> => {
   const res = await apiFetch(API_ENDPOINTS.SUPPLIERS);
   return res.data || res;
 };
 
-export const createSupplier = async (payload: any) => {
+export const fetchSupplierById = async (id: string): Promise<BackendSupplier> => {
+  const res = await apiFetch(`${API_ENDPOINTS.SUPPLIERS}/${id}`);
+  return res.data || res;
+};
+
+export const createSupplier = async (payload: SupplierPayload): Promise<BackendSupplier> => {
   const res = await apiFetch(API_ENDPOINTS.SUPPLIERS, {
     method: "POST",
     body: JSON.stringify(payload),
   });
   return res.data || res;
+};
+
+export const updateSupplier = async (id: string, payload: SupplierPayload): Promise<BackendSupplier> => {
+  const res = await apiFetch(`${API_ENDPOINTS.SUPPLIERS}/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+  return res.data || res;
+};
+
+export const deleteSupplier = async (id: string): Promise<void> => {
+  await apiFetch(`${API_ENDPOINTS.SUPPLIERS}/${id}`, {
+    method: "DELETE",
+  });
+};
+
+export const fetchSupplierBalance = async (id: string): Promise<number> => {
+  const res = await apiFetch(`${API_ENDPOINTS.SUPPLIERS}/${id}/balance`);
+  return res.data !== undefined ? res.data : res;
 };
 
 export const fetchPurchaseOrders = async () => {

@@ -96,7 +96,7 @@ export const SupplierManagementTab: React.FC = () => {
       if (backendSuppliers.length > 0) {
         const mappedSuppliers: SupplierItem[] = backendSuppliers.map(
           (s: any, idx: number) => {
-            const name = s.name || s.supplierName || `Supplier ${idx + 1}`;
+            const name = s.name || `Supplier ${idx + 1}`;
             const initials = name
               .split(" ")
               .map((n: string) => n[0])
@@ -106,10 +106,10 @@ export const SupplierManagementTab: React.FC = () => {
             return {
               id: s.id || `SUP-${idx + 1}`,
               name,
-              category: s.category || s.description || "General Goods",
-              phone: s.phone || s.contactPhone || "+1 415-555-0198",
-              email: s.email || s.contactEmail || "contact@supplier.com",
-              outstandingDebt: Number(s.outstandingDebt || s.debt || s.owe || 0),
+              category: s.contactName ? `Contact: ${s.contactName}` : s.address || "General Goods",
+              phone: s.phone || "+1 415-555-0198",
+              email: s.email || "contact@supplier.com",
+              outstandingDebt: Number(s.balance !== undefined ? s.balance : s.outstandingDebt || 0),
               initials,
               badgeClass:
                 idx % 3 === 0
@@ -122,45 +122,12 @@ export const SupplierManagementTab: React.FC = () => {
         );
         setSuppliers(mappedSuppliers);
       } else {
-        // Dynamic fallback list if supplier database table is fresh
-        const fallbackSuppliers: SupplierItem[] = [
-          {
-            id: "sup-1",
-            name: "Global Distributors Inc.",
-            category: "Electronics, Accessories",
-            phone: "+1 415-555-0198",
-            email: "sales@globaldist.com",
-            outstandingDebt: 12450,
-            initials: "GD",
-            badgeClass: "bg-primary-fixed text-on-primary-fixed",
-          },
-          {
-            id: "sup-2",
-            name: "Smart Supply Co.",
-            category: "Home Goods, Decor",
-            phone: "+1 312-555-4421",
-            email: "contact@smart.sup",
-            outstandingDebt: 0,
-            initials: "SS",
-            badgeClass: "bg-secondary-fixed text-on-secondary-fixed",
-          },
-          {
-            id: "sup-3",
-            name: "Apex Manufacturing",
-            category: "Hardware, Tools",
-            phone: "+1 212-555-8732",
-            email: "orders@apexmanu.com",
-            outstandingDebt: 32830,
-            initials: "AM",
-            badgeClass: "bg-tertiary-fixed text-on-tertiary-fixed",
-          },
-        ];
-        setSuppliers(fallbackSuppliers);
+        setSuppliers([]);
       }
 
       if (backendPOs.length > 0) {
         const mappedPOs: PurchaseOrderItem[] = backendPOs.map((po: any, idx: number) => {
-          const suppName = po.supplierName || "Global Distributors Inc.";
+          const suppName = po.supplierName || "Supplier Order";
           const initials = suppName
             .split(" ")
             .map((n: string) => n[0])
@@ -170,11 +137,11 @@ export const SupplierManagementTab: React.FC = () => {
 
           return {
             poNumber: po.poNumber || po.code || `PO-2026-${1040 + idx}`,
-            date: po.createdAt ? new Date(po.createdAt).toLocaleDateString() : "Oct 24, 2026",
+            date: po.createdAt ? new Date(po.createdAt).toLocaleDateString() : "Recent",
             supplierName: suppName,
             supplierInitials: initials,
-            itemCount: Number(po.itemCount || po.quantity || 145),
-            totalCost: Number(po.totalCost || po.totalAmount || 4520),
+            itemCount: Number(po.itemCount || po.quantity || 0),
+            totalCost: Number(po.totalCost || po.totalAmount || 0),
             status: (po.status === "COMPLETED"
               ? "Completed"
               : po.status === "PARTIAL"
@@ -182,52 +149,12 @@ export const SupplierManagementTab: React.FC = () => {
               : po.status === "CANCELLED"
               ? "Cancelled"
               : "Pending") as any,
-            receivedCount: po.receivedCount || (po.status === "PARTIAL" ? 40 : undefined),
+            receivedCount: po.receivedCount,
           };
         });
         setPurchaseOrders(mappedPOs);
       } else {
-        // Fallback POs
-        const fallbackPOs: PurchaseOrderItem[] = [
-          {
-            poNumber: "PO-2026-1042",
-            date: "Oct 24, 2026",
-            supplierName: "Global Distributors Inc.",
-            supplierInitials: "GD",
-            itemCount: 145,
-            totalCost: 4520.0,
-            status: "Pending",
-          },
-          {
-            poNumber: "PO-2026-1041",
-            date: "Oct 21, 2026",
-            supplierName: "Smart Supply Co.",
-            supplierInitials: "SS",
-            itemCount: 120,
-            totalCost: 2100.5,
-            status: "Partially Received",
-            receivedCount: 40,
-          },
-          {
-            poNumber: "PO-2026-1038",
-            date: "Oct 15, 2026",
-            supplierName: "Apex Manufacturing",
-            supplierInitials: "AM",
-            itemCount: 500,
-            totalCost: 12500.0,
-            status: "Completed",
-          },
-          {
-            poNumber: "PO-2026-1035",
-            date: "Oct 10, 2026",
-            supplierName: "Global Distributors Inc.",
-            supplierInitials: "GD",
-            itemCount: 30,
-            totalCost: 850.0,
-            status: "Cancelled",
-          },
-        ];
-        setPurchaseOrders(fallbackPOs);
+        setPurchaseOrders([]);
       }
     } catch (err: any) {
       console.error("Error loading suppliers data from backend:", err);
@@ -304,15 +231,17 @@ export const SupplierManagementTab: React.FC = () => {
   const handleAddSupplierPrompt = async () => {
     const name = window.prompt("Enter Supplier Name:");
     if (!name) return;
-    const category = window.prompt("Enter Category (e.g. Electronics, Tools):", "General Goods");
+    const contactName = window.prompt("Enter Contact Person Name:", "John Doe");
     const phone = window.prompt("Enter Phone Number:", "+1 415-555-0198");
     const email = window.prompt("Enter Email Address:", "sales@supplier.com");
+    const address = window.prompt("Enter Office Address:", "123 Business Way");
 
     const payload = {
       name: name.trim(),
-      category: category ? category.trim() : "General Goods",
+      contactName: contactName ? contactName.trim() : "John Doe",
       phone: phone ? phone.trim() : "+1 415-555-0198",
       email: email ? email.trim() : "sales@supplier.com",
+      address: address ? address.trim() : "123 Business Way",
     };
 
     try {

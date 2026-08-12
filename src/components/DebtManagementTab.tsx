@@ -101,52 +101,8 @@ export const DebtManagementTab: React.FC = () => {
         setCustomers(mappedList);
         setSelectedCustomerId(mappedList[0]?.id || "");
       } else {
-        // Fallback default ledger items if customer table is fresh
-        const fallbackList: CustomerDebtRecord[] = [
-          {
-            id: "1",
-            name: "Marcus Reed",
-            code: "CUST-8492",
-            creditLimit: 1500000,
-            outstandingDebt: 1245000,
-            status: "High",
-            invoices: [
-              {
-                id: "inv-1",
-                invoiceNumber: "INV-2026-089",
-                date: "Aug 02, 2026",
-                amount: 845000,
-                status: "Unpaid",
-              },
-              {
-                id: "inv-2",
-                invoiceNumber: "INV-2026-045",
-                date: "Jul 28, 2026",
-                amount: 400000,
-                status: "Overdue",
-              },
-            ],
-          },
-          {
-            id: "2",
-            name: "Sarah Lin",
-            code: "CUST-3391",
-            creditLimit: 500000,
-            outstandingDebt: 120050,
-            status: "Normal",
-            invoices: [
-              {
-                id: "inv-3",
-                invoiceNumber: "INV-2026-102",
-                date: "Aug 05, 2026",
-                amount: 120050,
-                status: "Unpaid",
-              },
-            ],
-          },
-        ];
-        setCustomers(fallbackList);
-        setSelectedCustomerId(fallbackList[0].id);
+        setCustomers([]);
+        setSelectedCustomerId("");
       }
     } catch (err: any) {
       console.error("Error fetching live debt ledger from backend:", err);
@@ -175,7 +131,7 @@ export const DebtManagementTab: React.FC = () => {
   );
 
   const handleRecordPayment = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault();    
     const amountNum = parseFloat(paymentAmount);
     if (isNaN(amountNum) || amountNum <= 0) {
       alert("Please enter a valid payment amount greater than 0");
@@ -213,12 +169,22 @@ export const DebtManagementTab: React.FC = () => {
     setTimeout(() => setFeedbackMsg(null), 4000);
   };
 
-  const creditUtilizationPercent = selectedCustomer
+  const safeCustomer = selectedCustomer || {
+    id: "none",
+    name: "No Customer Selected",
+    code: "CUST-0000",
+    creditLimit: 1000000,
+    outstandingDebt: 0,
+    status: "Normal" as const,
+    invoices: [],
+  };
+
+  const creditUtilizationPercent = safeCustomer.creditLimit > 0
     ? Math.min(
         100,
-        Math.round((selectedCustomer.outstandingDebt / selectedCustomer.creditLimit) * 100)
+        Math.round((safeCustomer.outstandingDebt / safeCustomer.creditLimit) * 100)
       )
-    : 0;
+    : 0; 
 
   if (loading) {
     return (
@@ -230,16 +196,6 @@ export const DebtManagementTab: React.FC = () => {
       </div>
     );
   }
-
-  const safeCustomer = selectedCustomer || {
-    id: "none",
-    name: "No Customer Selected",
-    code: "CUST-0000",
-    creditLimit: 0,
-    outstandingDebt: 0,
-    status: "Normal",
-    invoices: [],
-  };
 
   return (
     <div className="flex flex-col w-full bg-background min-h-full">
@@ -497,7 +453,7 @@ export const DebtManagementTab: React.FC = () => {
                 <span className="text-on-primary/80">Credit Utilization</span>
                 <span className="font-code-mono">
                   {creditUtilizationPercent}% (₦
-                  {(selectedCustomer.creditLimit / 1000).toFixed(0)}k Limit)
+                  {(safeCustomer.creditLimit / 1000).toFixed(0)}k Limit)
                 </span>
               </div>
               <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">

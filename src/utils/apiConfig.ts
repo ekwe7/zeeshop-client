@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   USERS: `${API_BASE_URL}/api/users`,
   ROLES: `${API_BASE_URL}/api/roles`,
   SALES: `${API_BASE_URL}/api/v1/sales`,
-  SUPPLIERS: `${API_BASE_URL}/api/v1/suppliers`,
+  SUPPLIERS: `${API_BASE_URL}/api/suppliers`,
   PURCHASE_ORDERS: `${API_BASE_URL}/api/v1/purchase-orders`,
   SWAGGER: `https://zeeshop-server.onrender.com/swagger-ui.html`,
 };
