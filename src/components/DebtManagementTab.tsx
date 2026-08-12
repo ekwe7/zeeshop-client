@@ -20,7 +20,6 @@ export interface CustomerDebtRecord {
 export const DebtManagementTab: React.FC = () => {
   const [customers, setCustomers] = useState<CustomerDebtRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,7 +36,6 @@ export const DebtManagementTab: React.FC = () => {
 
   const loadLedgerData = async () => {
     setLoading(true);
-    setError(null);
     try {
       const [customerRes, salesRes] = await Promise.allSettled([
         fetchCustomers(),
@@ -106,7 +104,6 @@ export const DebtManagementTab: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Error fetching live debt ledger from backend:", err);
-      setError("Failed to load customer ledger from backend server");
     } finally {
       setLoading(false);
     }
@@ -237,7 +234,7 @@ export const DebtManagementTab: React.FC = () => {
               const limitVal = parseFloat(limitStr) || 1000000;
 
               try {
-                const newCust = await createCustomer({
+                await createCustomer({
                   name: name.trim(),
                   creditLimit: limitVal,
                 });

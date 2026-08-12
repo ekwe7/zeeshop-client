@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 import type {
   User,
   Role,
   Permission,
-  AuthResponsePayload,
 } from "../types/auth-permissions";
 import {
   ROLE_DEFINITIONS,
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         role: data.role || "ADMIN",
         permissions:
           data.permissions ||
-          ROLE_DEFINITIONS[data.role || "ADMIN"]?.defaultPermissions ||
+          ROLE_DEFINITIONS[(data.role as Role) || "ADMIN"]?.defaultPermissions ||
           [],
       };
 

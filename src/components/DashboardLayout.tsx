@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import type { Role } from "../types/auth-permissions";
 import { ROLE_DEFINITIONS } from "../types/auth-permissions";
-import { fetchProducts } from "../utils/apiClient";
 
 export const DashboardLayout: React.FC = () => {
-  const { user, tokens, logout, hasPermission, hasRole, switchRoleDemo } = useAuth();
+  const { user, tokens, logout, hasPermission, hasRole } = useAuth();
   const [activeTab, setActiveTab] = useState<
     "overview" | "catalog" | "inventory" | "users" | "sales" | "settings" | "debt" | "suppliers"
   >(() => (user?.role === "CASHIER" ? "sales" : "catalog"));
-  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
 
   if (!user) return null;

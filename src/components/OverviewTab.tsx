@@ -14,23 +14,19 @@ export const OverviewTab: React.FC = () => {
   const [users, setUsers] = useState<BackendUser[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [sales, setSales] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!canReadAnalytics) return;
 
     setLoading(true);
-    // Fetch users (which exists on Swagger under /api/users)
-    fetchUsers()
-      .then((uData) => {
-        setUsers(Array.isArray(uData) ? uData : (uData as any)?.data || []);
-      })
-      .catch((err) => {
-        console.warn("User fetch warning:", err.message);
-      })
-      .finally(() => {
+    Promise.allSettled([fetchUsers(), fetchProducts(), fetchSales()])
+      .then(([uRes, pRes, sRes]) => {
+        if (uRes.status === "fulfilled") setUsers(Array.isArray(uRes.value) ? uRes.value : (uRes.value as any)?.content || []);
+        if (pRes.status === "fulfilled") setProducts(Array.isArray(pRes.value) ? pRes.value : (pRes.value as any)?.content || []);
+        if (sRes.status === "fulfilled") setSales(Array.isArray(sRes.value) ? sRes.value : (sRes.value as any)?.content || []);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [canReadAnalytics]);
 
   if (!canReadAnalytics) {

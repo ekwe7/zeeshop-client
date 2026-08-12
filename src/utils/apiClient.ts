@@ -1,6 +1,6 @@
-import { API_BASE_URL, API_ENDPOINTS } from "./apiConfig";
+import { API_ENDPOINTS } from "./apiConfig";
 
-export const getAuthHeader = () => {
+export const getAuthHeader = (): Record<string, string> => {
   const directToken = localStorage.getItem("accessToken");
   if (directToken) {
     return { Authorization: `Bearer ${directToken}` };
@@ -66,10 +66,10 @@ export const apiFetch = async (
   endpoint: string,
   options: RequestInit = {}
 ) => {
-  let headers = {
+  let headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-    ...(options.headers || {}),
+    ...((options.headers as Record<string, string>) || {}),
   };
 
   try {

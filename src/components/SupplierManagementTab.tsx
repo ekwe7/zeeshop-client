@@ -4,7 +4,6 @@ import {
   createSupplier,
   fetchPurchaseOrders,
   createPurchaseOrder,
-  fetchProducts,
 } from "../utils/apiClient";
 
 export interface SupplierItem {
@@ -32,9 +31,6 @@ export interface PurchaseOrderItem {
 export const SupplierManagementTab: React.FC = () => {
   const [suppliers, setSuppliers] = useState<SupplierItem[]>([]);
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrderItem[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Filters & Search
   const [supplierSearch, setSupplierSearch] = useState("");
@@ -61,37 +57,25 @@ export const SupplierManagementTab: React.FC = () => {
   }, []);
 
   const loadData = async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const [suppRes, poRes, prodRes] = await Promise.allSettled([
+      const [suppRes, poRes] = await Promise.allSettled([
         fetchSuppliers(),
         fetchPurchaseOrders(),
-        fetchProducts(),
       ]);
 
       const backendSuppliers =
         suppRes.status === "fulfilled"
           ? Array.isArray(suppRes.value)
             ? suppRes.value
-            : suppRes.value.content || []
+            : (suppRes.value as any)?.content || []
           : [];
 
       const backendPOs =
         poRes.status === "fulfilled"
           ? Array.isArray(poRes.value)
             ? poRes.value
-            : poRes.value.content || []
+            : (poRes.value as any)?.content || []
           : [];
-
-      const backendProducts =
-        prodRes.status === "fulfilled"
-          ? Array.isArray(prodRes.value)
-            ? prodRes.value
-            : prodRes.value.content || []
-          : [];
-
-      setProducts(backendProducts);
 
       if (backendSuppliers.length > 0) {
         const mappedSuppliers: SupplierItem[] = backendSuppliers.map(
@@ -158,9 +142,6 @@ export const SupplierManagementTab: React.FC = () => {
       }
     } catch (err: any) {
       console.error("Error loading suppliers data from backend:", err);
-      setError("Failed to fetch supplier information from backend");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -260,7 +241,7 @@ export const SupplierManagementTab: React.FC = () => {
       const localSupp: SupplierItem = {
         id: `SUP-${Date.now()}`,
         name: name.trim(),
-        category: payload.category,
+        category: payload.address,
         phone: payload.phone,
         email: payload.email,
         outstandingDebt: 0,

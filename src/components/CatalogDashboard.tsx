@@ -8,6 +8,8 @@ import {
   updateProduct,
   deleteProduct,
   createCategory,
+  updateCategory,
+  deleteCategory,
   createUnit,
 } from "../utils/apiClient";
 
