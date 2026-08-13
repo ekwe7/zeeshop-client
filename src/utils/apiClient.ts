@@ -334,13 +334,22 @@ export const fetchUserById = async (id: string): Promise<BackendUser> => {
 };
 
 export const createUser = async (payload: CreateUserPayload): Promise<BackendUser> => {
+  const roleVal = payload.roleId || payload.role;
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  
   const requestBody: Record<string, any> = {
     username: payload.username,
     email: payload.email,
     password: payload.password,
-    roleId: payload.roleId || payload.role,
     enabled: payload.enabled ?? true,
   };
+
+  if (uuidRegex.test(roleVal)) {
+    requestBody.roleId = roleVal;
+  } else {
+    requestBody.role = roleVal;
+    requestBody.roleId = roleVal;
+  }
 
   const res = await apiFetch(API_ENDPOINTS.USERS, {
     method: "POST",
